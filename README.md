@@ -33,7 +33,7 @@ See the [PA1 specification][] on the course
 website for a detailed specification of the assignment.
 
 Refer to the [ChocoPy Specification][] on the CS164 web site
-for the specification of the ChocoPy language. 
+for the specification of the ChocoPy language.
 
 ## Receiving updates to this repository
 
@@ -48,8 +48,10 @@ To sync with updates upstream:
 
 ## Submission writeup
 
-Team member 1: 
+Team member 1: Elihofni Guirra Lima
 
-Team member 2: 
+Team member 2: Henrique de Morais Porto
+
+Team member 3: Marco de Sousa Melo
 
 (Students should edit this section with their write-up)
