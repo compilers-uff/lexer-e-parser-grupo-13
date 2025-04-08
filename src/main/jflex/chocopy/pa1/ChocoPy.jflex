@@ -57,26 +57,133 @@ LineBreak  = \r|\n|\r\n
 
 IntegerLiteral = 0 | [1-9][0-9]*
 
+DoubleQuote = \"
+Backslash = \\
+/* 
+Segundo ao item 3.4.1 da documentação, são aceitos os caracteres ASCII: [32-126, menos \ e "]
+32 = \u0020
+126 = \u007E
+\ = \u0022
+" = \u005C
+*/
+AsciiChar = [\u0020-\u0021\u0023-\u005B\u005D-\u007E]
+
+/* 
+Ainda no item 3.4.1 da documentação, são aceitos somente as seguintes sequencias de escape:
+\" = double quote
+\n = newline
+\t = tab
+\\ = backslash
+*/
+EscapedChar = {Backslash}([\"nt\\])
+
+/*
+Juntando temos a StringLiteral.
+*/
+StringLiteral = {DoubleQuote}({AsciiChar}|{EscapedChar})*{DoubleQuote}
+
+/*
+Identifier: o nome de variavel ou função
+*/
+IdString = [_a-zA-Z][_a-z0-9A-Z]*
+
+/* FALTA:
+- Comments
+- NEWLINE, INDENT, DEDENT (usar variavel global, entender melhor no item 3.1.5).
+*/
+
 %%
 
 
 <YYINITIAL> {
 
-  /* Delimiters. */
-  {LineBreak}                 { return symbol(ChocoPyTokens.NEWLINE); }
+  /* Delimiters */
+    {LineBreak}                 { return symbol(ChocoPyTokens.NEWLINE); }
 
-  /* Literals. */
-  {IntegerLiteral}            { return symbol(ChocoPyTokens.NUMBER,
-                                                 Integer.parseInt(yytext())); }
-
-  /* Operators. */
-  "+"                         { return symbol(ChocoPyTokens.PLUS, yytext()); }
+  /* Operators (item 3.5 da documentação) */
+  /* + - * // % < > <= >= == != = ( ) [ ] , : . -> */
+    "+"                         { return symbol(ChocoPyTokens.PLUS); }
+    "-"                         { return symbol(ChocoPyTokens.MINUS); }
+    "*"                         { return symbol(ChocoPyTokens.STAR); }
+    "//"                        { return symbol(ChocoPyTokens.DOUBLE_SLASH); }
+    "%"                         { return symbol(ChocoPyTokens.PERCENT); }
+    "<"                         { return symbol(ChocoPyTokens.LESS_THAN); }
+    ">"                         { return symbol(ChocoPyTokens.GREATER_THAN); }
+    "<="                        { return symbol(ChocoPyTokens.LESS_THAN_EQUAL); }
+    ">="                        { return symbol(ChocoPyTokens.GREATER_THAN_EQUAL); }
+    "=="                        { return symbol(ChocoPyTokens.EQUAL_EQUAL); }
+    "!="                        { return symbol(ChocoPyTokens.NOT_EQUAL); }
+    "="                         { return symbol(ChocoPyTokens.ASSIGN); }
+    "("                         { return symbol(ChocoPyTokens.LEFT_PAREN); }
+    ")"                         { return symbol(ChocoPyTokens.RIGHT_PAREN); }
+    "["                         { return symbol(ChocoPyTokens.LEFT_BRACKET); }
+    "]"                         { return symbol(ChocoPyTokens.RIGHT_BRACKET); }
+    ","                         { return symbol(ChocoPyTokens.COMMA); }
+    ":"                         { return symbol(ChocoPyTokens.COLON); }
+    "."                         { return symbol(ChocoPyTokens.DOT); }
+    "->"                        { return symbol(ChocoPyTokens.ARROW); }
 
   /* Whitespace. */
-  {WhiteSpace}                { /* ignore */ }
+    {WhiteSpace}                { /* ignore */ }
+
+  /* TODO Keywords (item 3.3 da documentação) */
+    "False"                     { return symbol(ChocoPyTokens.FALSE); }
+    "None"                      { return symbol(ChocoPyTokens.NONE); }
+    "True"                      { return symbol(ChocoPyTokens.TRUE); }
+    "and"                       { return symbol(ChocoPyTokens.AND); }
+    "as"                        { return symbol(ChocoPyTokens.AS); }
+    "assert"                    { return symbol(ChocoPyTokens.ASSERT); }
+    "async"                     { return symbol(ChocoPyTokens.ASYNC); }
+    "await"                     { return symbol(ChocoPyTokens.AWAIT); }
+    "break"                     { return symbol(ChocoPyTokens.BREAK); }
+    "class"                     { return symbol(ChocoPyTokens.CLASS); }
+    "continue"                  { return symbol(ChocoPyTokens.CONTINUE); }
+    "def"                       { return symbol(ChocoPyTokens.DEF); }
+    "del"                       { return symbol(ChocoPyTokens.DEL); }
+    "elif"                      { return symbol(ChocoPyTokens.ELIF); }
+    "else"                      { return symbol(ChocoPyTokens.ELSE); }
+    "except"                    { return symbol(ChocoPyTokens.EXCEPT); }
+    "finally"                   { return symbol(ChocoPyTokens.FINALLY); }
+    "for"                       { return symbol(ChocoPyTokens.FOR); }
+    "from"                      { return symbol(ChocoPyTokens.FROM); }
+    "global"                    { return symbol(ChocoPyTokens.GLOBAL); }
+    "if"                        { return symbol(ChocoPyTokens.IF); }
+    "import"                    { return symbol(ChocoPyTokens.IMPORT); }
+    "in"                        { return symbol(ChocoPyTokens.IN); }
+    "is"                        { return symbol(ChocoPyTokens.IS); }
+    "lambda"                    { return symbol(ChocoPyTokens.LAMBDA); }
+    "nonlocal"                  { return symbol(ChocoPyTokens.NONLOCAL); }
+    "not"                       { return symbol(ChocoPyTokens.NOT); }
+    "or"                        { return symbol(ChocoPyTokens.OR); }
+    "pass"                      { return symbol(ChocoPyTokens.PASS); }
+    "raise"                     { return symbol(ChocoPyTokens.RAISE); }
+    "return"                    { return symbol(ChocoPyTokens.RETURN); }
+    "try"                       { return symbol(ChocoPyTokens.TRY); }
+    "while"                     { return symbol(ChocoPyTokens.WHILE); }
+    "with"                      { return symbol(ChocoPyTokens.WITH); }
+    "yield"                     { return symbol(ChocoPyTokens.YIELD); }
+
+  /*
+  Literal: to denote a constant literal such as an integer literal, a string literal.
+  */
+    {IntegerLiteral}            { return symbol(ChocoPyTokens.NUMBER, Integer.parseInt(yytext())); }
+    {StringLiteral}             { return symbol(ChocoPyTokens.STRING, yytext()); }
+
+  /* Identifiers */
+    {IdString}                  { return symbol(ChocoPyTokens.IDENTIFIER, yytext()); }
+
 }
 
 <<EOF>>                       { return symbol(ChocoPyTokens.EOF); }
 
 /* Error fallback. */
 [^]                           { return symbol(ChocoPyTokens.UNRECOGNIZED); }
+
+
+/*
+links importantes:
+https://jflex.de/manual.html
+https://classroom.google.com/c/NzU5OTA0OTQ1NDA1/m/NzU5OTM1NTExMzk2/details
+https://docs.google.com/document/d/1wqPQzb4nLzOB8LDCB8lRMzFOSLDb0n4tsnLgZQOu8AY/edit?tab=t.0
+https://github.com/compilers-uff/lexer-e-parser-grupo-13
+*/
