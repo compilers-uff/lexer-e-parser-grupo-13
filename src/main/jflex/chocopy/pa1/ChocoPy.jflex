@@ -87,8 +87,12 @@ Identifier: o nome de variavel ou função
 */
 IdString = [_a-zA-Z][_a-z0-9A-Z]*
 
-/* FALTA:
-- Comments
+/*
+Comment: Comentário de linha única (sem multiline) -> python regex equivalent -> (?P<comment>#.*#)
+*/
+Comment = #.*#
+
+/* TODO
 - NEWLINE, INDENT, DEDENT (usar variavel global, entender melhor no item 3.1.5).
 */
 
