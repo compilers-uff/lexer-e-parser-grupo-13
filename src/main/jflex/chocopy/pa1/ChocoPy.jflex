@@ -137,66 +137,66 @@ Comment = #.*#
         yybegin(LINE_START);
     }
   
-  /* Operators (item 3.5 da documentação) */
-  /* + - * // % < > <= >= == != = ( ) [ ] , : . -> */
-    "+"                         { return symbol(ChocoPyTokens.PLUS); }
-    "-"                         { return symbol(ChocoPyTokens.MINUS); }
-    "*"                         { return symbol(ChocoPyTokens.STAR); }
-    "//"                        { return symbol(ChocoPyTokens.DOUBLE_SLASH); }
-    "%"                         { return symbol(ChocoPyTokens.PERCENT); }
-    "<"                         { return symbol(ChocoPyTokens.LESS_THAN); }
-    ">"                         { return symbol(ChocoPyTokens.GREATER_THAN); }
-    "<="                        { return symbol(ChocoPyTokens.LESS_THAN_EQUAL); }
-    ">="                        { return symbol(ChocoPyTokens.GREATER_THAN_EQUAL); }
-    "=="                        { return symbol(ChocoPyTokens.EQUAL_EQUAL); }
-    "!="                        { return symbol(ChocoPyTokens.NOT_EQUAL); }
-    "="                         { return symbol(ChocoPyTokens.ASSIGN); }
-    "("                         { return symbol(ChocoPyTokens.LEFT_PAREN); }
-    ")"                         { return symbol(ChocoPyTokens.RIGHT_PAREN); }
-    "["                         { return symbol(ChocoPyTokens.LEFT_BRACKET); }
-    "]"                         { return symbol(ChocoPyTokens.RIGHT_BRACKET); }
-    ","                         { return symbol(ChocoPyTokens.COMMA); }
-    ":"                         { return symbol(ChocoPyTokens.COLON); }
-    "."                         { return symbol(ChocoPyTokens.DOT); }
-    "->"                        { return symbol(ChocoPyTokens.ARROW); }
+	/* Operators (item 3.5 da documentação) */
+	/* + - * // % < > <= >= == != = ( ) [ ] , : . -> */
+    "+"                         { return symbol(ChocoPyTokens.PLUS, yytext()); }
+    "-"                         { return symbol(ChocoPyTokens.MINUS, yytext()); }
+    "*"                         { return symbol(ChocoPyTokens.STAR, yytext()); }
+    "//"                        { return symbol(ChocoPyTokens.DOUBLE_SLASH, yytext()); }
+    "%"                         { return symbol(ChocoPyTokens.PERCENT, yytext()); }
+    "<"                         { return symbol(ChocoPyTokens.LESS_THAN, yytext()); }
+    ">"                         { return symbol(ChocoPyTokens.GREATER_THAN, yytext()); }
+    "<="                        { return symbol(ChocoPyTokens.LESS_THAN_EQUAL, yytext()); }
+    ">="                        { return symbol(ChocoPyTokens.GREATER_THAN_EQUAL, yytext()); }
+    "=="                        { return symbol(ChocoPyTokens.EQUAL_EQUAL, yytext()); }
+    "!="                        { return symbol(ChocoPyTokens.NOT_EQUALS, yytext()); }
+    "="                         { return symbol(ChocoPyTokens.ASSIGN, yytext()); }
+    "("                         { return symbol(ChocoPyTokens.LEFT_PAREN, yytext()); }
+    ")"                         { return symbol(ChocoPyTokens.RIGHT_PAREN, yytext()); }
+    "["                         { return symbol(ChocoPyTokens.LEFT_BRACKET, yytext()); }
+    "]"                         { return symbol(ChocoPyTokens.RIGHT_BRACKET, yytext()); }
+    ","                         { return symbol(ChocoPyTokens.COMMA, yytext()); }
+    ":"                         { return symbol(ChocoPyTokens.COLON, yytext()); }
+    "."                         { return symbol(ChocoPyTokens.DOT, yytext()); }
+    "->"                        { return symbol(ChocoPyTokens.RIGHT_ARROW, yytext()); }
 
 
-  /* TODO Keywords (item 3.3 da documentação) */
-    "False"                     { return symbol(ChocoPyTokens.FALSE); }
-    "None"                      { return symbol(ChocoPyTokens.NONE); }
-    "True"                      { return symbol(ChocoPyTokens.TRUE); }
-    "and"                       { return symbol(ChocoPyTokens.AND); }
-    "as"                        { return symbol(ChocoPyTokens.AS); }
-    "assert"                    { return symbol(ChocoPyTokens.ASSERT); }
-    "async"                     { return symbol(ChocoPyTokens.ASYNC); }
-    "await"                     { return symbol(ChocoPyTokens.AWAIT); }
-    "break"                     { return symbol(ChocoPyTokens.BREAK); }
-    "class"                     { return symbol(ChocoPyTokens.CLASS); }
-    "continue"                  { return symbol(ChocoPyTokens.CONTINUE); }
-    "def"                       { return symbol(ChocoPyTokens.DEF); }
-    "del"                       { return symbol(ChocoPyTokens.DEL); }
-    "elif"                      { return symbol(ChocoPyTokens.ELIF); }
-    "else"                      { return symbol(ChocoPyTokens.ELSE); }
-    "except"                    { return symbol(ChocoPyTokens.EXCEPT); }
-    "finally"                   { return symbol(ChocoPyTokens.FINALLY); }
-    "for"                       { return symbol(ChocoPyTokens.FOR); }
-    "from"                      { return symbol(ChocoPyTokens.FROM); }
-    "global"                    { return symbol(ChocoPyTokens.GLOBAL); }
-    "if"                        { return symbol(ChocoPyTokens.IF); }
-    "import"                    { return symbol(ChocoPyTokens.IMPORT); }
-    "in"                        { return symbol(ChocoPyTokens.IN); }
-    "is"                        { return symbol(ChocoPyTokens.IS); }
-    "lambda"                    { return symbol(ChocoPyTokens.LAMBDA); }
-    "nonlocal"                  { return symbol(ChocoPyTokens.NONLOCAL); }
-    "not"                       { return symbol(ChocoPyTokens.NOT); }
-    "or"                        { return symbol(ChocoPyTokens.OR); }
-    "pass"                      { return symbol(ChocoPyTokens.PASS); }
-    "raise"                     { return symbol(ChocoPyTokens.RAISE); }
-    "return"                    { return symbol(ChocoPyTokens.RETURN); }
-    "try"                       { return symbol(ChocoPyTokens.TRY); }
-    "while"                     { return symbol(ChocoPyTokens.WHILE); }
-    "with"                      { return symbol(ChocoPyTokens.WITH); }
-    "yield"                     { return symbol(ChocoPyTokens.YIELD); }
+	/* TODO Keywords (item 3.3 da documentação) */
+    "False"                     { return symbol(ChocoPyTokens.FALSE, yytext()); }
+    "None"                      { return symbol(ChocoPyTokens.NONE, yytext()); }
+    "True"                      { return symbol(ChocoPyTokens.TRUE, yytext()); }
+    "and"                       { return symbol(ChocoPyTokens.AND, yytext()); }
+    "as"                        { return symbol(ChocoPyTokens.AS, yytext()); }
+    "assert"                    { return symbol(ChocoPyTokens.ASSERT, yytext()); }
+    "async"                     { return symbol(ChocoPyTokens.ASYNC, yytext()); }
+    "await"                     { return symbol(ChocoPyTokens.AWAIT, yytext()); }
+    "break"                     { return symbol(ChocoPyTokens.BREAK, yytext()); }
+    "class"                     { return symbol(ChocoPyTokens.CLASS, yytext()); }
+    "continue"                  { return symbol(ChocoPyTokens.CONTINUE, yytext()); }
+    "def"                       { return symbol(ChocoPyTokens.DEF, yytext()); }
+    "del"                       { return symbol(ChocoPyTokens.DEL, yytext()); }
+    "elif"                      { return symbol(ChocoPyTokens.ELIF, yytext()); }
+    "else"                      { return symbol(ChocoPyTokens.ELSE, yytext()); }
+    "except"                    { return symbol(ChocoPyTokens.EXCEPT, yytext()); }
+    "finally"                   { return symbol(ChocoPyTokens.FINALLY, yytext()); }
+    "for"                       { return symbol(ChocoPyTokens.FOR, yytext()); }
+    "from"                      { return symbol(ChocoPyTokens.FROM, yytext()); }
+    "global"                    { return symbol(ChocoPyTokens.GLOBAL, yytext()); }
+    "if"                        { return symbol(ChocoPyTokens.IF, yytext()); }
+    "import"                    { return symbol(ChocoPyTokens.IMPORT, yytext()); }
+    "in"                        { return symbol(ChocoPyTokens.IN, yytext()); }
+    "is"                        { return symbol(ChocoPyTokens.IS, yytext()); }
+    "lambda"                    { return symbol(ChocoPyTokens.LAMBDA, yytext()); }
+    "nonlocal"                  { return symbol(ChocoPyTokens.NONLOCAL, yytext()); }
+    "not"                       { return symbol(ChocoPyTokens.NOT, yytext()); }
+    "or"                        { return symbol(ChocoPyTokens.OR, yytext()); }
+    "pass"                      { return symbol(ChocoPyTokens.PASS, yytext()); }
+    "raise"                     { return symbol(ChocoPyTokens.RAISE, yytext()); }
+    "return"                    { return symbol(ChocoPyTokens.RETURN, yytext()); }
+    "try"                       { return symbol(ChocoPyTokens.TRY, yytext()); }
+    "while"                     { return symbol(ChocoPyTokens.WHILE, yytext()); }
+    "with"                      { return symbol(ChocoPyTokens.WITH, yytext()); }
+    "yield"                     { return symbol(ChocoPyTokens.YIELD, yytext()); }
 
   /*
   Literal: to denote a constant literal such as an integer literal, a string literal.
