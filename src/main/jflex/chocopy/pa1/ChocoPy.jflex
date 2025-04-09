@@ -16,6 +16,8 @@ import java_cup.runtime.*;
 %cup
 %cupdebug
 
+%state LINE_START
+
 %eofclose false
 
 /*** Do not change the flags above unless you know what you are doing. ***/
@@ -46,6 +48,26 @@ import java_cup.runtime.*;
             new ComplexSymbolFactory.Location(yyline + 1, yycolumn + 1),
             new ComplexSymbolFactory.Location(yyline + 1,yycolumn + yylength()),
             value);
+    }
+    /*inicio da pilha de indentação no nivel zero*/
+    private java.util.Stack<Integer> indentStack = new java.util.Stack<>();
+    private int pendingDedents = 0;
+    private boolean emitNewline = false;
+    private boolean startOfLine = true;
+
+    {
+        indentStack.push(0);
+    }
+    /* contador de whitespaces no inicio da linha*/
+    private int computeIndentation(String line) {
+        int count = 0;
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            if (c == ' ') count++;
+            else if (c == '\t') count += 8 - (count % 8);
+            else break;
+        }
+        return count;
     }
 
 %}
@@ -96,10 +118,21 @@ IdString = [_a-zA-Z][_a-z0-9A-Z]*
 
 
 <YYINITIAL> {
+    // Gera dedents pendentes
+    if (pendingDedents > 0) {
+        pendingDedents--;
+        return symbol(ChocoPyTokens.DEDENT);
+    }
+    /* Whitespace. */
+    {WhiteSpace}                { /* ignore */ }
 
-  /* Delimiters */
-    {LineBreak}                 { return symbol(ChocoPyTokens.NEWLINE); }
-
+    /* Delimiters */
+    {LineBreak} {
+        emitNewline = true;
+        startOfLine = true;
+        yybegin(LINE_START);
+    }
+  
   /* Operators (item 3.5 da documentação) */
   /* + - * // % < > <= >= == != = ( ) [ ] , : . -> */
     "+"                         { return symbol(ChocoPyTokens.PLUS); }
@@ -123,8 +156,6 @@ IdString = [_a-zA-Z][_a-z0-9A-Z]*
     "."                         { return symbol(ChocoPyTokens.DOT); }
     "->"                        { return symbol(ChocoPyTokens.ARROW); }
 
-  /* Whitespace. */
-    {WhiteSpace}                { /* ignore */ }
 
   /* TODO Keywords (item 3.3 da documentação) */
     "False"                     { return symbol(ChocoPyTokens.FALSE); }
@@ -173,8 +204,64 @@ IdString = [_a-zA-Z][_a-z0-9A-Z]*
     {IdString}                  { return symbol(ChocoPyTokens.IDENTIFIER, yytext()); }
 
 }
+<LINE_START> {
+    {WhiteSpace}* {
+        String indentText = yytext();
+        int currentIndent = computeIndentation(indentText);
 
-<<EOF>>                       { return symbol(ChocoPyTokens.EOF); }
+        int lookahead;
+        try {
+            lookahead = yycharat(yylength());
+        } catch (Exception e) {
+            lookahead = -1;
+        }
+        // Leia o próximo caractere para ver se a linha é vazia/comentário
+        if (lookahead == '#' || lookahead == '\n' || lookahead == '\r' || lookahead == -1) {
+            startOfLine = false;
+            yybegin(YYINITIAL);
+        } else {
+            int prevIndent = indentStack.peek();
+            if (currentIndent == prevIndent) {
+                if (emitNewline) {
+                    emitNewline = false;
+                    yybegin(YYINITIAL);
+                    return symbol(ChocoPyTokens.NEWLINE);
+                }
+                yybegin(YYINITIAL);
+            } else if (currentIndent > prevIndent) {
+                indentStack.push(currentIndent);
+                yybegin(YYINITIAL);
+                return symbol(ChocoPyTokens.INDENT);
+            } else {
+                pendingDedents = 0;
+                while (indentStack.peek() > currentIndent) {
+                    indentStack.pop();
+                    pendingDedents++;
+                }
+                if (indentStack.peek() != currentIndent) {
+                    throw new Error("Indentation Error");
+                }
+                if (emitNewline) {
+                    emitNewline = false;
+                    return symbol(ChocoPyTokens.NEWLINE);
+                }
+                if (pendingDedents > 0) {
+                    pendingDedents--;
+                    return symbol(ChocoPyTokens.DEDENT);
+                }
+                yybegin(YYINITIAL);
+            }
+        }
+    }
+}
+
+<<EOF>>                       {
+  while (indentStack.size() > 1) {
+        indentStack.pop();
+        return symbol(ChocoPyTokens.DEDENT);
+    }
+    return symbol(ChocoPyTokens.EOF);
+}
 
 /* Error fallback. */
 [^]                           { return symbol(ChocoPyTokens.UNRECOGNIZED); }
