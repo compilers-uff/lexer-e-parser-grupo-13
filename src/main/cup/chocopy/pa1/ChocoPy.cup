@@ -143,11 +143,82 @@ action code {:
  * in actions ( {: ... :} ).
  */
 terminal NEWLINE;
-terminal String PLUS; 
-terminal Integer NUMBER; 
+
+/* Errors */
 /* Returned by the lexer for erroneous tokens.  Since it does not appear in
  * the grammar, it indicates a syntax error. */
-terminal UNRECOGNIZED;   
+terminal UNRECOGNIZED;
+terminal INTEGER_OVERFLOW_LEXICAL_ERROR;
+
+/* Keywords. */
+terminal String FALSE;
+terminal String NONE;
+terminal String TRUE;
+terminal String AND;
+terminal String AS;
+terminal String ASSERT;
+terminal String ASYNC;
+terminal String AWAIT;
+terminal String BREAK;
+terminal String CLASS;
+terminal String CONTINUE;
+terminal String DEF;
+terminal String DEL;
+terminal String ELIF;
+terminal String ELSE;
+terminal String EXCEPT;
+terminal String FINALLY;
+terminal String FOR;
+terminal String FROM;
+terminal String GLOBAL;
+terminal String IF;
+terminal String IMPORT;
+terminal String IN;
+terminal String IS;
+terminal String LAMBDA;
+terminal String NONLOCAL;
+terminal String NOT;
+terminal String OR;
+terminal String PASS;
+terminal String RAISE;
+terminal String RETURN;
+terminal String TRY;
+terminal String WHILE;
+terminal String WITH;
+terminal String YIELD;
+terminal String INDENT; // FIXME Validar se está na categoria correta
+terminal String DEDENT; // FIXME Validar se está na categoria correta
+
+/* Literals. */
+terminal Integer NUMBER;
+terminal String IDSTRING;
+terminal String STRING;
+
+/* Operators. */
+terminal String PLUS;
+terminal String MINUS;
+terminal String STAR;
+terminal String DOUBLE_SLASH;
+terminal String PERCENT;
+terminal String LESS_THAN;
+terminal String GREATER_THAN;
+terminal String LESS_THAN_EQUAL;
+terminal String GREATER_THAN_EQUAL;
+terminal String EQUAL_EQUAL;
+terminal String NOT_EQUALS;
+terminal String ASSIGN;
+terminal String LEFT_PAREN;
+terminal String RIGHT_PAREN;
+terminal String LEFT_BRACKET;
+terminal String RIGHT_BRACKET;
+terminal String COMMA;
+terminal String COLON;
+terminal String DOT;
+terminal String RIGHT_ARROW;
+
+/* Identifiers. */
+terminal String IDENTIFIER;
+
 
 /* Nonterminal symbols (defined in production rules below).
  * As for terminal symbols, 
