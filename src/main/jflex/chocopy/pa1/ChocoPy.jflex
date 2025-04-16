@@ -110,9 +110,12 @@ Identifier: o nome de variavel ou função
 IdString = [_a-zA-Z][_a-z0-9A-Z]*
 
 /*
-Comment: Comentário de linha única (sem multiline) -> python regex equivalent -> (?P<comment>#.*#)
+Comment: 
+No item 3.1.3 diz: A comment starts with a hash character (#) that is not part of a string literal, and ends at the end of the
+physical line. Comments are ignored by the lexical analyzer; they are not emitted as tokens.
+E seguindo o 3.1.1 que diz que uma linha pode ser \n, \r ou \r\n
 */
-Comment = #.*#
+Comment = #[^\n\r]*
 
 /* TODO
 - NEWLINE, INDENT, DEDENT (usar variavel global, entender melhor no item 3.1.5).
@@ -129,6 +132,9 @@ Comment = #.*#
     }
     /* Whitespace. */
     {WhiteSpace}                { /* ignore */ }
+
+    /* Comment. */
+    {Comment}                   { /* ignore */ }
 
     /* Delimiters */
     {LineBreak} {
