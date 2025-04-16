@@ -130,6 +130,16 @@ action code {:
         return new ComplexSymbolFactory.Location(first.getLocation()[0],
                                                  first.getLocation()[1]);
     }
+        /** Return the rightmost non-whitespace location in NODES, or null if NODES
+     *  is empty. Assumes that the nodes of NODES are ordered left to right. */
+    ComplexSymbolFactory.Location getRight(List<? extends Node> nodes) {
+        if (nodes.isEmpty()) {
+            return null;
+        }
+        Node last = nodes.get(nodes.size() - 1);
+        return new ComplexSymbolFactory.Location(last.getLocation()[0],
+                                                 last.getLocation()[1]);
+    }
 
 :}
 
@@ -143,11 +153,83 @@ action code {:
  * in actions ( {: ... :} ).
  */
 terminal NEWLINE;
-terminal String PLUS; 
-terminal Integer NUMBER; 
+
+/* Errors */
 /* Returned by the lexer for erroneous tokens.  Since it does not appear in
  * the grammar, it indicates a syntax error. */
-terminal UNRECOGNIZED;   
+terminal UNRECOGNIZED;
+terminal INTEGER_OVERFLOW_LEXICAL_ERROR;
+
+/* Keywords. */
+terminal String FALSE;
+terminal String NONE;
+terminal String TRUE;
+terminal String AND;
+terminal String AS;
+terminal String ASSERT;
+terminal String ASYNC;
+terminal String AWAIT;
+terminal String BREAK;
+terminal String CLASS;
+terminal String CONTINUE;
+terminal String DEF;
+terminal String DEL;
+terminal String ELIF;
+terminal String ELSE;
+terminal String EXCEPT;
+terminal String FINALLY;
+terminal String FOR;
+terminal String FROM;
+terminal String GLOBAL;
+terminal String IF;
+terminal String IMPORT;
+terminal String IN;
+terminal String IS;
+terminal String LAMBDA;
+terminal String NONLOCAL;
+terminal String NOT;
+terminal String OR;
+terminal String PASS;
+terminal String RAISE;
+terminal String RETURN;
+terminal String TRY;
+terminal String WHILE;
+terminal String WITH;
+terminal String YIELD;
+terminal String INDENT; // FIXME Validar se está na categoria correta
+terminal String DEDENT; // FIXME Validar se está na categoria correta
+
+/* Literals. */
+terminal Integer NUMBER;
+terminal String IDSTRING;
+terminal String STRING;
+
+/* Operators. */
+terminal String PLUS;
+terminal String MINUS;
+terminal String UMINUS;
+terminal String STAR;
+terminal String DOUBLE_SLASH;
+terminal String PERCENT;
+terminal String LESS_THAN;
+terminal String GREATER_THAN;
+terminal String LESS_THAN_EQUAL;
+terminal String GREATER_THAN_EQUAL;
+terminal String EQUAL_EQUAL;
+terminal String NOT_EQUALS;
+terminal String ASSIGN;
+terminal String LEFT_PAREN;
+terminal String RIGHT_PAREN;
+terminal String LEFT_BRACKET;
+terminal String RIGHT_BRACKET;
+terminal String COMMA;
+terminal String COLON;
+terminal String DOT;
+terminal String RIGHT_ARROW;
+
+/* Identifiers. */
+terminal String IDENTIFIER;
+
 
 /* Nonterminal symbols (defined in production rules below).
  * As for terminal symbols, 
@@ -162,7 +244,9 @@ non terminal Expr              expr, binary_expr;
 
 /* Precedences (lowest to highest) for resolving what would otherwise be
  * ambiguities in the form of shift/reduce conflicts.. */
-precedence left PLUS;
+precedence left PLUS, MINUS;
+precedence left STAR;
+precedence right UMINUS;
 
 /* The start symbol. */
 start with program;
@@ -205,10 +289,16 @@ expr ::= binary_expr:e  {: RESULT = e; :}
        | NUMBER:n       {: RESULT = new IntegerLiteral(nxleft, nxright, n); :}
        ;
 
+expr ::= MINUS:op expr:e
+                        {: RESULT = new UnaryExpr(opxleft, exright, op, e); :}
+        ;
 
 /* A binary expression, illustrating how to find the left and right
  * source position of a phrase. */
 binary_expr ::= expr:e1 PLUS:op expr:e2
                         {: RESULT = new BinaryExpr(e1xleft, e2xright,
                                                    e1, op, e2); :}
-              ;
+                      | expr:e1 MINUS:op expr:e2
+                        {: RESULT = new BinaryExpr(e1xleft, e2xright, e1, op, e2); :}
+                      | expr:e1 STAR:op expr:e2
+                        {: RESULT = new BinaryExpr(e1xleft, e2xright, e1, op, e2); :};
