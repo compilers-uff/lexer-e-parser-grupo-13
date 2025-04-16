@@ -130,6 +130,16 @@ action code {:
         return new ComplexSymbolFactory.Location(first.getLocation()[0],
                                                  first.getLocation()[1]);
     }
+        /** Return the rightmost non-whitespace location in NODES, or null if NODES
+     *  is empty. Assumes that the nodes of NODES are ordered left to right. */
+    ComplexSymbolFactory.Location getRight(List<? extends Node> nodes) {
+        if (nodes.isEmpty()) {
+            return null;
+        }
+        Node last = nodes.get(nodes.size() - 1);
+        return new ComplexSymbolFactory.Location(last.getLocation()[0],
+                                                 last.getLocation()[1]);
+    }
 
 :}
 
@@ -197,6 +207,7 @@ terminal String STRING;
 /* Operators. */
 terminal String PLUS;
 terminal String MINUS;
+terminal String UMINUS;
 terminal String STAR;
 terminal String DOUBLE_SLASH;
 terminal String PERCENT;
@@ -233,7 +244,9 @@ non terminal Expr              expr, binary_expr;
 
 /* Precedences (lowest to highest) for resolving what would otherwise be
  * ambiguities in the form of shift/reduce conflicts.. */
-precedence left PLUS;
+precedence left PLUS, MINUS;
+precedence left STAR;
+precedence right UMINUS;
 
 /* The start symbol. */
 start with program;
@@ -276,10 +289,16 @@ expr ::= binary_expr:e  {: RESULT = e; :}
        | NUMBER:n       {: RESULT = new IntegerLiteral(nxleft, nxright, n); :}
        ;
 
+expr ::= MINUS:op expr:e
+                        {: RESULT = new UnaryExpr(opxleft, exright, op, e); :}
+        ;
 
 /* A binary expression, illustrating how to find the left and right
  * source position of a phrase. */
 binary_expr ::= expr:e1 PLUS:op expr:e2
                         {: RESULT = new BinaryExpr(e1xleft, e2xright,
                                                    e1, op, e2); :}
-              ;
+                      | expr:e1 MINUS:op expr:e2
+                        {: RESULT = new BinaryExpr(e1xleft, e2xright, e1, op, e2); :}
+                      | expr:e1 STAR:op expr:e2
+                        {: RESULT = new BinaryExpr(e1xleft, e2xright, e1, op, e2); :};

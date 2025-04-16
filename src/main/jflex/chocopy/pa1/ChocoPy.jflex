@@ -141,6 +141,7 @@ Comment = #[^\n\r]*
         emitNewline = true;
         startOfLine = true;
         yybegin(LINE_START);
+        
     }
   
 	/* Operators (item 3.5 da documentação) */
@@ -229,6 +230,7 @@ Comment = #[^\n\r]*
         if (lookahead == '#' || lookahead == '\n' || lookahead == '\r' || lookahead == -1) {
             startOfLine = false;
             yybegin(YYINITIAL);
+            return symbol(ChocoPyTokens.NEWLINE);
         } else {
             int prevIndent = indentStack.peek();
             if (currentIndent == prevIndent) {
@@ -238,6 +240,7 @@ Comment = #[^\n\r]*
                     return symbol(ChocoPyTokens.NEWLINE);
                 }
                 yybegin(YYINITIAL);
+                return symbol(ChocoPyTokens.NEWLINE);
             } else if (currentIndent > prevIndent) {
                 indentStack.push(currentIndent);
                 yybegin(YYINITIAL);
@@ -265,14 +268,17 @@ Comment = #[^\n\r]*
     }
 }
 
-<<EOF>>                       {
-  while (indentStack.size() > 1) {
+<<EOF>> {
+    if (emitNewline) {
+        emitNewline = false;
+        return symbol(ChocoPyTokens.NEWLINE);
+    }
+    while (indentStack.size() > 1) {
         indentStack.pop();
         return symbol(ChocoPyTokens.DEDENT);
     }
     return symbol(ChocoPyTokens.EOF);
 }
-
 /* Error fallback. */
 [^]                           { return symbol(ChocoPyTokens.UNRECOGNIZED); }
 
